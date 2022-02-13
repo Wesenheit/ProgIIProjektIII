@@ -35,11 +35,17 @@ paker_pakowanko(PyObject *self, PyObject *args)
     long *tab;  // lista przedmiotów
     int n=PyList_Size(lista);   //długość listy
     tab=(long*)malloc(sizeof(long)* (n+1)); //alokujemy pamięć na listę
+
     tab[0]=0;   //w sumie to zerowy obiekt nie jest ważny
     for (int i=0;i<n;i++)   //rozpakowujemy listę
     {
         PyObject *temp=PyList_GetItem(lista, i);    
         tab[i+1]=PyLong_AsLong(temp);
+        if (tab[i+1]<0)
+        {
+            PyErr_BadArgument();
+            return NULL;
+        }
     }
     node **maxa;
     maxa=(node**)malloc(sizeof(node*)* (n+1)); //alokujemy pamięć  
@@ -61,7 +67,7 @@ paker_pakowanko(PyObject *self, PyObject *args)
     {
         for (int j = 0; j <= num; j++)
         {
-            if (tab[a]<j)
+            if (tab[a]<=j)
             {
                 if (maxa[a-1][j].waga>tab[a]+maxa[a-1][j-tab[a]].waga)
                 {
@@ -89,7 +95,7 @@ paker_pakowanko(PyObject *self, PyObject *args)
     {
         if (maxa[n][num].tab[i]==1)
         {
-            PyObject *temp=PyLong_FromLong(tab[i]); 
+            PyObject *temp=PyLong_FromLong(tab[i+1]); 
             PyList_Append(wyn,temp);    //dodajemy elementy do wyniku
         }
     }
